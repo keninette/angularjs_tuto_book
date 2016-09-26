@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html ng-app="jeangillesapp">
+    <head>
+        <title>Jean-Gilles</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <div ng-controller="welcome-controller">
+            <!-- welcome message -->
+            <h1>Hello world !</h1>
+            Wilkommen on Jean-Gilles' brand new website !
+            <p>
+                <strong>{{dates.dateDifference}}</strong> day(s) left before Christmas !
+                <br /> Jean-Gilles loves Christmas !
+            </p>
+            
+            <!-- present form & display -->
+            <div ng-controller="present-controller">
+                So, what do you want for Christmas ?
+                <br />
+                <form action="">
+                    <!-- Only show name input if it hasn't already been filled -->
+                    <fieldset>
+                        <label for="name">Your name : </label>  
+                        <input type="text" name="name" id="name" ng-model="name" ng-blur="addUser(name)"/><br />
+                    </fieldset>
+                    <fieldset>
+                        <label for="present">Present : </label> 
+                        <input type="text" name="present" id="present"  ng-blur="addPresent(present)" ng-model="present"/>
+                    </fieldset>
+                </form>
+                <p ng-hide="name === ''">Alright, <strong>{{name}}</strong>, you would love to have one of those for Christmas :
+                    <ul>
+                        <li ng-repeat="present in presents">{{present}}</li>
+                    </ul>
+                </p>
+            </div>
+        </div>
+        <!-- Scripts -->
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+        <script type="text/javascript">
+            
+            function welcomeController($scope) {
+                var dDay    = new Date("December, 24, 2016");
+                var today   = new Date();
+                var dateDifference = parseInt((dDay.getTime() - today.getTime())/(24*3600*1000));
+                
+                $scope.dates    = {"dateDifference": dateDifference };
+            }   
+            
+            function localStorageExists(storageName) {
+                return (!(
+                    localStorage.getItem(storageName)       === null
+                    || localStorage.getItem(storageName)    === undefined
+                    || localStorage.getItem(storageName)    === 'undefined'
+                ));
+            }
+            
+            function presentController($scope) {
+                
+                // Check if name exists in scope
+                if ($scope.name === '' 
+                        || $scope.name === undefined
+                        || $scope.name === 'undefined'
+                
+                // if not check if name exists in localStorage
+                ) {
+                    $scope.name = localStorageExists("name") ? localStorage.getItem("name") : '';
+                } 
+                
+                // set up scope.presents
+                $scope.presents = localStorage.getItem("presents") || [];
+                console.log($scope.presents);
+                
+                $scope.addUser = function(name) {
+                    if (! localStorageExists("name")){
+                        localStorage.setItem("name", name);
+                    } 
+                }; 
+                
+                $scope.addPresent = function(present) {
+                    console.log($scope.presents);
+                    $scope.presents.push(present);
+                    console.log($scope.presents);
+                    localStorage.removeItem(presents);
+                    localStorage.setItem('presents',JSON.stringify($scope.presents));
+                };
+            }
+            
+            angular.module("jeangillesapp",[])
+                    .controller("welcome-controller",   welcomeController)
+                    .controller("present-controller",   presentController);
+            
+        </script>
+    </body>
+</html>
